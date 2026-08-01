@@ -55,7 +55,8 @@ def deposit():
 
     print("\nDeposit Successful!")
     print(f"Current Balance: ₹{accounts[account_id].balance}")
-    
+
+
 def withdraw():
 
     account_id = int(input("Enter Account ID: "))
@@ -76,9 +77,34 @@ def withdraw():
     print("\nWithdrawal Successful!")
     print(f"Current Balance: ₹{accounts[account_id].balance}")
 
+
+def check_balance():
+
+    account_id = int(input("Enter Account ID: "))
+
+    if account_id not in accounts:
+        raise AccountNotFoundError("Account not found.")
+
+    print(f"\nCustomer Name : {accounts[account_id].customer_name}")
+    print(f"Current Balance : ₹{accounts[account_id].balance}")
+
+
+def close_account():
+
+    account_id = int(input("Enter Account ID: "))
+
+    if account_id not in accounts:
+        raise AccountNotFoundError("Account not found.")
+
+    del accounts[account_id]
+
+    print("\nAccount closed successfully.")
+
+
 if __name__ == "__main__":
 
     while True:
+
         print("\n===== SecureBank =====")
         print("1. Create Account")
         print("2. Deposit")
@@ -88,14 +114,36 @@ if __name__ == "__main__":
         print("6. Exit")
 
         choice = input("Enter your choice: ")
-        if choice == "1":
-            create_account()
-        elif choice == "2":
-            deposit()
-        elif choice == "3":
-            withdraw()
-        elif choice == "6":
-            print("Thank you for using SecureBank!")
-            break
-        else:
-            print("Feature coming soon...")
+
+        try:
+
+            if choice == "1":
+                create_account()
+
+            elif choice == "2":
+                deposit()
+
+            elif choice == "3":
+                withdraw()
+
+            elif choice == "4":
+                check_balance()
+
+            elif choice == "5":
+                close_account()
+
+            elif choice == "6":
+                print("Thank you for using SecureBank!")
+                break
+
+            else:
+                print("Invalid Choice.")
+
+        except AccountNotFoundError as e:
+            print(e)
+
+        except InsufficientFundsError as e:
+            print(e)
+
+        except ValueError:
+            print("Please enter valid numeric input.")
