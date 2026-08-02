@@ -8,7 +8,16 @@ class Account:
     balance: float
 
 
-accounts = {}
+@dataclass
+class Transaction:
+    transaction_type: str
+    amount: float
+    source_account: int
+    target_account: int | None = None
+
+
+accounts: dict[int, Account] = {}
+transactions: dict[int, list[Transaction]] = {}
 next_account_id = 1
 
 
@@ -32,6 +41,7 @@ def create_account():
     )
 
     accounts[next_account_id] = account
+    transactions[next_account_id] = []
 
     print("\nAccount created successfully!")
     print(f"Account ID: {next_account_id}")
@@ -52,6 +62,13 @@ def deposit():
         return
 
     accounts[account_id].balance += amount
+    transactions[account_id].append(
+        Transaction(
+            transaction_type="Deposit",
+            amount=amount,
+            source_account=account_id
+        )
+    )
 
     print("\nDeposit Successful!")
     print(f"Current Balance: ₹{accounts[account_id].balance}")
@@ -73,6 +90,13 @@ def withdraw():
         raise InsufficientFundsError("Insufficient balance.")
 
     accounts[account_id].balance -= amount
+    transactions[account_id].append(
+        Transaction(
+            transaction_type="Withdraw",
+            amount=amount,
+            source_account=account_id
+        )
+    )
 
     print("\nWithdrawal Successful!")
     print(f"Current Balance: ₹{accounts[account_id].balance}")
@@ -97,6 +121,7 @@ def close_account():
         raise AccountNotFoundError("Account not found.")
 
     del accounts[account_id]
+    del transactions[account_id]
 
     print("\nAccount closed successfully.")
 
@@ -133,7 +158,7 @@ if __name__ == "__main__":
                 close_account()
 
             elif choice == "6":
-                print("Thank you for using SecureBank!")
+                print("\nThank you for using SecureBank!")
                 break
 
             else:
