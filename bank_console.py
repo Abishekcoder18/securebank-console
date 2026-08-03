@@ -102,6 +102,62 @@ def withdraw():
     print(f"Current Balance: ₹{accounts[account_id].balance}")
 
 
+def transfer():
+
+    from_account = int(input("From Account ID: "))
+    to_account = int(input("To Account ID: "))
+    amount = float(input("Transfer Amount: "))
+
+    if from_account not in accounts:
+        raise AccountNotFoundError("Source account not found.")
+
+    if to_account not in accounts:
+        raise AccountNotFoundError("Destination account not found.")
+
+    if amount <= 0:
+        print("Transfer amount must be greater than zero.")
+        return
+
+    if amount > accounts[from_account].balance:
+        raise InsufficientFundsError("Insufficient balance.")
+
+    # Save original balances (Rollback)
+    original_from_balance = accounts[from_account].balance
+    original_to_balance = accounts[to_account].balance
+
+    try:
+
+        accounts[from_account].balance -= amount
+        accounts[to_account].balance += amount
+
+        transactions[from_account].append(
+            Transaction(
+                transaction_type="Transfer Out",
+                amount=amount,
+                source_account=from_account,
+                target_account=to_account
+            )
+        )
+
+        transactions[to_account].append(
+            Transaction(
+                transaction_type="Transfer In",
+                amount=amount,
+                source_account=from_account,
+                target_account=to_account
+            )
+        )
+
+        print("\nTransfer Successful!")
+
+    except Exception:
+
+        accounts[from_account].balance = original_from_balance
+        accounts[to_account].balance = original_to_balance
+
+        raise
+
+
 def check_balance():
 
     account_id = int(input("Enter Account ID: "))
@@ -134,9 +190,10 @@ if __name__ == "__main__":
         print("1. Create Account")
         print("2. Deposit")
         print("3. Withdraw")
-        print("4. Check Balance")
-        print("5. Close Account")
-        print("6. Exit")
+        print("4. Transfer")
+        print("5. Check Balance")
+        print("6. Close Account")
+        print("7. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -152,12 +209,15 @@ if __name__ == "__main__":
                 withdraw()
 
             elif choice == "4":
-                check_balance()
+                transfer()
 
             elif choice == "5":
-                close_account()
+                check_balance()
 
             elif choice == "6":
+                close_account()
+
+            elif choice == "7":
                 print("\nThank you for using SecureBank!")
                 break
 
