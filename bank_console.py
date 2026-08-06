@@ -1,3 +1,18 @@
+"""
+SecureBank Console Application
+
+Week 1:
+- Account Management
+- Deposit and Withdraw
+- Balance Inquiry
+- Close Account
+
+Week 2:
+- Transaction History
+- Money Transfer
+- Transaction Reversal
+- Customer Search using defaultdict
+"""
 from dataclasses import dataclass
 from collections import defaultdict
 
