@@ -13,6 +13,7 @@ Week 2:
 - Transaction Reversal
 - Customer Search using defaultdict
 """
+
 from dataclasses import dataclass
 from collections import defaultdict
 
@@ -32,12 +33,14 @@ class Transaction:
     target_account: int | None = None
 
 
+# In-memory storage
 accounts: dict[int, Account] = {}
 transactions: dict[int, list[Transaction]] = {}
 customer_index: defaultdict[str, list[int]] = defaultdict(list)
 next_account_id = 1
 
 
+# Custom Exceptions
 class AccountNotFoundError(Exception):
     pass
 
@@ -45,6 +48,8 @@ class AccountNotFoundError(Exception):
 class InsufficientFundsError(Exception):
     pass
 
+
+# Account & Transaction Operations
 
 def create_account():
     global next_account_id
@@ -80,6 +85,7 @@ def deposit():
         return
 
     accounts[account_id].balance += amount
+
     transactions[account_id].append(
         Transaction(
             transaction_type="Deposit",
@@ -108,6 +114,7 @@ def withdraw():
         raise InsufficientFundsError("Insufficient balance.")
 
     accounts[account_id].balance -= amount
+
     transactions[account_id].append(
         Transaction(
             transaction_type="Withdraw",
@@ -139,7 +146,7 @@ def transfer():
     if amount > accounts[from_account].balance:
         raise InsufficientFundsError("Insufficient balance.")
 
-    # Save original balances (Rollback)
+    # Save original balances for rollback
     original_from_balance = accounts[from_account].balance
     original_to_balance = accounts[to_account].balance
 
@@ -253,11 +260,11 @@ def close_account():
     if account_id not in accounts:
         raise AccountNotFoundError("Account not found.")
 
-    # Remove from customer index before deleting
+    # Remove account from customer index
     customer_name = accounts[account_id].customer_name
     customer_index[customer_name].remove(account_id)
-    
-    # Clean up empty customer entries
+
+    # Remove empty customer entry
     if not customer_index[customer_name]:
         del customer_index[customer_name]
 
@@ -266,6 +273,8 @@ def close_account():
 
     print("\nAccount closed successfully.")
 
+
+# CLI Application
 
 if __name__ == "__main__":
 
