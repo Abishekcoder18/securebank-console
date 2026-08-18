@@ -16,6 +16,7 @@ Week 2:
 
 from dataclasses import dataclass
 from collections import defaultdict
+from bisect import insort
 
 
 @dataclass
@@ -38,6 +39,7 @@ accounts: dict[int, Account] = {}
 transactions: dict[int, list[Transaction]] = {}
 customer_index: defaultdict[str, list[int]] = defaultdict(list)
 next_account_id = 1
+sorted_account_ids: list[int] = []
 
 
 # Custom Exceptions
@@ -51,6 +53,7 @@ class InsufficientFundsError(Exception):
 
 # Account & Transaction Operations
 
+# Creates a new bank account
 def create_account():
     global next_account_id
 
@@ -65,6 +68,7 @@ def create_account():
     accounts[next_account_id] = account
     transactions[next_account_id] = []
     customer_index[customer_name].append(next_account_id)
+    insort(sorted_account_ids, next_account_id)
 
     print("\nAccount created successfully!")
     print(f"Account ID: {next_account_id}")
@@ -72,6 +76,7 @@ def create_account():
     next_account_id += 1
 
 
+# Deposits money into an account
 def deposit():
 
     account_id = int(input("Enter Account ID: "))
@@ -98,6 +103,7 @@ def deposit():
     print(f"Current Balance: ₹{accounts[account_id].balance}")
 
 
+# Withdraws money from an account
 def withdraw():
 
     account_id = int(input("Enter Account ID: "))
@@ -127,6 +133,7 @@ def withdraw():
     print(f"Current Balance: ₹{accounts[account_id].balance}")
 
 
+# Transfers money between two accounts
 def transfer():
 
     from_account = int(input("From Account ID: "))
@@ -183,6 +190,7 @@ def transfer():
         raise
 
 
+# Finds all accounts belonging to a customer
 def find_accounts_by_customer():
 
     customer_name = input("Enter Customer Name: ")
@@ -203,6 +211,7 @@ def find_accounts_by_customer():
             )
 
 
+# Reverses the most recent transaction
 def reverse_last_transaction():
 
     account_id = int(input("Enter Account ID: "))
@@ -242,6 +251,7 @@ def reverse_last_transaction():
     print("Last transaction reversed successfully.")
 
 
+# Displays the current balance of an account
 def check_balance():
 
     account_id = int(input("Enter Account ID: "))
@@ -253,6 +263,26 @@ def check_balance():
     print(f"Current Balance : ₹{accounts[account_id].balance}")
 
 
+# Lists all accounts in ascending order
+def list_accounts():
+    if not sorted_account_ids:
+        print("\nNo accounts available.")
+        return
+
+    print("\n===== All Accounts =====")
+
+    for account_id in sorted_account_ids:
+        if account_id in accounts:
+            account = accounts[account_id]
+
+            print(
+                f"Account ID: {account.id} | "
+                f"Customer: {account.customer_name} | "
+                f"Balance: ₹{account.balance}"
+            )
+
+
+# Closes an existing account
 def close_account():
 
     account_id = int(input("Enter Account ID: "))
@@ -267,6 +297,9 @@ def close_account():
     # Remove empty customer entry
     if not customer_index[customer_name]:
         del customer_index[customer_name]
+
+    # Remove from sorted list
+    sorted_account_ids.remove(account_id)
 
     del accounts[account_id]
     del transactions[account_id]
@@ -287,9 +320,10 @@ if __name__ == "__main__":
         print("4. Transfer")
         print("5. Reverse Last Transaction")
         print("6. Find Customer Accounts")
-        print("7. Check Balance")
-        print("8. Close Account")
-        print("9. Exit")
+        print("7. List Accounts")
+        print("8. Check Balance")
+        print("9. Close Account")
+        print("10. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -314,12 +348,15 @@ if __name__ == "__main__":
                 find_accounts_by_customer()
 
             elif choice == "7":
-                check_balance()
+                list_accounts()
 
             elif choice == "8":
-                close_account()
+                check_balance()
 
             elif choice == "9":
+                close_account()
+
+            elif choice == "10":
                 print("\nThank you for using SecureBank!")
                 break
 
