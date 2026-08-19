@@ -282,6 +282,27 @@ def list_accounts():
             )
 
 
+# Lists all accounts sorted by balance (lowest to highest)
+def list_accounts_by_balance():
+    sorted_accounts = sorted(
+        accounts.values(),
+        key=lambda account: account.balance
+    )
+
+    if not sorted_accounts:
+        print("\nNo accounts available.")
+        return
+
+    print("\n===== Accounts by Balance =====")
+
+    for account in sorted_accounts:
+        print(
+            f"Account ID: {account.id} | "
+            f"Customer: {account.customer_name} | "
+            f"Balance: ₹{account.balance}"
+        )
+
+
 # Closes an existing account
 def close_account():
 
@@ -321,9 +342,10 @@ if __name__ == "__main__":
         print("5. Reverse Last Transaction")
         print("6. Find Customer Accounts")
         print("7. List Accounts")
-        print("8. Check Balance")
-        print("9. Close Account")
-        print("10. Exit")
+        print("8. List Accounts by Balance")
+        print("9. Check Balance")
+        print("10. Close Account")
+        print("11. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -351,12 +373,15 @@ if __name__ == "__main__":
                 list_accounts()
 
             elif choice == "8":
-                check_balance()
+                list_accounts_by_balance()
 
             elif choice == "9":
-                close_account()
+                check_balance()
 
             elif choice == "10":
+                close_account()
+
+            elif choice == "11":
                 print("\nThank you for using SecureBank!")
                 break
 
