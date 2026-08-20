@@ -17,6 +17,7 @@ Week 2:
 from dataclasses import dataclass
 from collections import defaultdict
 from bisect import insort
+from sortedcontainers import SortedDict
 
 
 @dataclass
@@ -40,6 +41,7 @@ transactions: dict[int, list[Transaction]] = {}
 customer_index: defaultdict[str, list[int]] = defaultdict(list)
 next_account_id = 1
 sorted_account_ids: list[int] = []
+transaction_index = SortedDict()
 
 
 # Custom Exceptions
@@ -99,6 +101,12 @@ def deposit():
         )
     )
 
+    transaction_index[len(transaction_index) + 1] = (
+        account_id,
+        "Deposit",
+        amount
+    )
+
     print("\nDeposit Successful!")
     print(f"Current Balance: ₹{accounts[account_id].balance}")
 
@@ -127,6 +135,12 @@ def withdraw():
             amount=amount,
             source_account=account_id
         )
+    )
+
+    transaction_index[len(transaction_index) + 1] = (
+        account_id,
+        "Withdraw",
+        amount
     )
 
     print("\nWithdrawal Successful!")
@@ -303,6 +317,26 @@ def list_accounts_by_balance():
         )
 
 
+# Shows all transactions from the sorted index
+def show_transaction_index():
+
+    if not transaction_index:
+        print("\nNo transactions available.")
+        return
+
+    print("\n===== Sorted Transaction Index =====")
+
+    for key, value in transaction_index.items():
+        account_id, transaction_type, amount = value
+
+        print(
+            f"Key: {key} | "
+            f"Account ID: {account_id} | "
+            f"Type: {transaction_type} | "
+            f"Amount: ₹{amount}"
+        )
+
+
 # Closes an existing account
 def close_account():
 
@@ -345,7 +379,8 @@ if __name__ == "__main__":
         print("8. List Accounts by Balance")
         print("9. Check Balance")
         print("10. Close Account")
-        print("11. Exit")
+        print("11. Show Sorted Transaction Index")
+        print("12. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -382,6 +417,9 @@ if __name__ == "__main__":
                 close_account()
 
             elif choice == "11":
+                show_transaction_index()
+
+            elif choice == "12":
                 print("\nThank you for using SecureBank!")
                 break
 
